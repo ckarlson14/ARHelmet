@@ -2,7 +2,7 @@
 
 THREE.js with jeelizFaceFilter in Vue.js.
 
-## Recommended IDE Setup
+## Integrated packages
 
 [Three.js](https://threejs.org/) + [jeelizFaceFilter](https://github.com/jeeliz/jeelizFaceFilter/tree/master)
 
