@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="holder">
     <div class="color-picker">
       <div>
         <Chrome showButtons="false" v-model="helmetColor" />
@@ -29,23 +29,19 @@
       <input type="file" @change="onFileChange" />
     </div>
 
-    <!-- <div id="container"> -->
-    <canvas id="jeeFaceFilterCanvas" ref="faceFilterCanvas"></canvas>
-    <canvas id="videoCanvas"></canvas>
-    <!-- </div> -->
+    <div id="canvas-holder">
+      <canvas id="jeeFaceFilterCanvas" ref="faceFilterCanvas"></canvas>
+      <canvas id="videoCanvas"></canvas>
+    </div>
   </div>
 </template>
 
 <script>
+
 // import * as THREE from 'three';
-// import { RGBAToHexA } from "@/util/colorFix.js";
 import { Chrome } from "@lk77/vue3-color";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
-// import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 
-/* global JEELIZFACEFILTER, JeelizThreeHelper, THREE, JeelizResizer  */
-
-// Your existing code goes here
 
 const SETTINGS = {
   offsetXYZ: [0, 0.5, -0.5], // offset of the model in 3D along vertical and depth axis
@@ -62,11 +58,6 @@ function init_videoCanvas(videoElement) {
   console.log("init video canvas");
 
   function updateVideoCanvas() {
-    // console.log(
-    //   "update video canvas",
-    //   videoElement.videoWidth,
-    //   videoElement.videoHeight
-    // );
     videoCanvas.width = videoElement.videoWidth;
     videoCanvas.height = videoElement.videoHeight;
     videoCanvas2.width = videoElement.videoWidth;
@@ -108,7 +99,6 @@ function init_threeScene(spec, modelURL) {
       // if (child.isMesh) {
       //   // child.material.depthWrite = true;
       // }
-
       // if (child.isMesh && child.material && child.material.name === "Logo") {
       //   console.log("found logo", child);
       //   child.renderOrder = 3;
@@ -154,13 +144,10 @@ function init_threeScene(spec, modelURL) {
     gltf.scene.scale.multiplyScalar(SETTINGS.scale / sizeX);
 
     gltf.scene.rotation.y = -Math.PI / 2;
-    // gltf.scene.position.z -= 2;
     // Add the model to the helmet group instead of the faceObject.
     helmetGroup.add(gltf.scene);
     loadedModel = helmetGroup;
-    console.log("added faceobject");
   });
-
 
   THREECAMERA = JeelizThreeHelper.create_camera();
 }
@@ -169,13 +156,13 @@ function changeMaterialColor(object, materialName, newColor) {
   if (object) {
     object.traverse((child) => {
       if (child.isMesh)
-        console.log(
-          "found child mesh",
-          child,
-          child.material?.name,
-          materialName,
-          child.material?.name === materialName
-        );
+        // console.log(
+        //   "found child mesh",
+        //   child,
+        //   child.material?.name,
+        //   materialName,
+        //   child.material?.name === materialName
+        // );
       if (child.isMesh && child.material.name === materialName) {
         console.log("set material color", newColor);
         child.material.color.set(newColor);
@@ -188,15 +175,15 @@ function addImage(object, URL) {
   console.log("add image", object, URL);
   if (object) {
     object.traverse((child) => {
-      // console.log("child", child);
-      // if (child.isMesh && child.material.name === "Helmet") {
+      console.log("child", child);
+      // if (child.isMesh && child.material.name === "Outer_Wrap") {
       if (child.isMesh && child.material && child.material.name === "Logo") {
         console.log("found logo", child);
         const texture = new THREE.TextureLoader().load(URL);
-        console.log("loaded texture", texture)
+        console.log("loaded texture", texture);
         child.material.map = texture;
         child.material.needsUpdate = true;
-      } 
+      }
     });
   }
 }
@@ -207,13 +194,11 @@ const destroyJeeliz = async () => {
 
 function main(modelURL) {
   console.log("main load jeeliz", modelURL);
-  // await JEELIZFACEFILTER?.destroy();
   console.log("existing destroyed");
   try {
     JeelizResizer.size_canvas({
       canvasId: "jeeFaceFilterCanvas",
       isFullScreen: true,
-
       callback: function (isError, bestVideoSettings) {
         start(modelURL, bestVideoSettings);
       },
@@ -222,7 +207,6 @@ function main(modelURL) {
         console.log("resize video canvas");
         document.getElementById("videoCanvas").style.transform =
           document.getElementById("jeeFaceFilterCanvas").style.transform;
-        // JEELIZFACEFILTER.resize();
       },
     });
   } catch (e) {
@@ -243,7 +227,6 @@ function start(modelURL, bestVideoSettings) {
         return;
       }
       console.log("INFO: JEELIZFACEFILTER IS READY", spec);
-
       const videoElement = spec.videoElement;
       console.log("found video element", videoElement);
       let videoInitialized = false;
@@ -275,7 +258,6 @@ function start(modelURL, bestVideoSettings) {
       }
 
       init_threeScene(spec, modelURL);
-      //   JEELIZFACEFILTER.render_video();
     }, //end callbackReady()
 
     // called at each render iteration (drawing loop):
@@ -322,41 +304,35 @@ export default {
     imageURL: {
       deep: true,
       handler(newValue) {
-        console.log("image added", newValue.hex);
-
+        console.log("image added", newValue);
         this.addImage(loadedModel, this.imageURL);
-
-        // this.changeMaterialColor(newValue.hex);
-        // this.changeMaterialColor(newValue.hex);
-
-        // this.changeMaterialColor(loadedModel, "Helmet", newValue.hex);
       },
     },
     helmetColor: {
       deep: true,
       handler(newValue) {
-        console.log("helmet color changed", newValue);
+        console.log("helmet  changed", newValue);
         this.changeMaterialColor(loadedModel, "Outer_Wrap", newValue.hex);
       },
     },
     facemaskColor: {
       deep: true,
       handler(newValue) {
-        console.log("facemaskColor color changed", newValue);
+        console.log("facemask color changed", newValue);
         this.changeMaterialColor(loadedModel, "Facemask", newValue.hex);
       },
     },
     stripe1Color: {
       deep: true,
       handler(newValue) {
-        console.log("stripe1Color color changed", newValue);
+        console.log("stripe1 color changed", newValue);
         this.changeMaterialColor(loadedModel, "Stripe1", newValue.hex);
       },
     },
     stripe2Color: {
       deep: true,
       handler(newValue) {
-        console.log("stripe2Color color changed", newValue);
+        console.log("stripe2 color changed", newValue);
         this.changeMaterialColor(loadedModel, "Stripe2 ", newValue.hex);
       },
     },
@@ -370,8 +346,6 @@ export default {
   },
   methods: {
     addCanvas() {
-      //   this.$refs.faceFilterCanvas.width = 600;
-      //   this.$refs.faceFilterCanvas.height = 600;
       this.main(this.helmetFile);
     },
     start,
@@ -384,21 +358,14 @@ export default {
       this.createImageUrl(file);
     },
     createImageUrl(file) {
-      // Create a URL for the uploaded image file
       this.imageURL = URL.createObjectURL(file);
-      // this.addImage(loadedModel, this.imageURL);
     },
-    // setImage(){
-    //   this.addImage(this.loadedModel, this.imageURL)
-    // },
+
   },
 };
 </script>
 
 <style scoped>
-/* .helmet-view {
-  z-index: 999;
-} */
 
 #videoCanvas {
   z-index: 10;
@@ -407,25 +374,43 @@ export default {
 #jeeFaceFilterCanvas {
   z-index: 20;
 }
+.holder{
+  /* position: absolute; */
+  width: 100%;
+  height: 100%;
+}
 
 .color-picker {
+  position: relative;
+  /* top: 0;
+  left: 0; */
   display: flex;
   flex: 1;
   flex-direction: row;
   z-index: 30;
 }
 
-.label{
-  color: white
+.label {
+  color: white;
 }
 
+.canvas-holder {
+  position: relative;
+  margin-top: 2em;
+  /* width: 100%; */
+  /* height: 100%;/ */
+  /* width: 100vw; */
+  /* margin-top: 150px; */
+}
 canvas {
   /* z-index: 20; */
   position: absolute;
-  width: 100%;
-  height: 100%;
-  margin-top: 150px;
-  top: 150px;
-  left: 0px;
+  /* top: 0; */
+  /* left: 0; */
+  /* width: 100%; */
+  /* height: 100%; */
+  /* 
+  top: 150px; */
+  /* left: 0px; */
 }
 </style>
