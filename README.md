@@ -1,14 +1,22 @@
 # ARExample
 
-This template should help get you started developing with Vue 3 in Vite.
+THREE.js with jeelizFaceFilter in Vue.js.
 
 ## Recommended IDE Setup
 
-[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur) + [TypeScript Vue Plugin (Volar)](https://marketplace.visualstudio.com/items?itemName=Vue.vscode-typescript-vue-plugin).
+[Three.js](https://threejs.org/) + [jeelizFaceFilter](https://github.com/jeeliz/jeelizFaceFilter/tree/master)
 
 ## Customize configuration
 
-See [Vite Configuration Reference](https://vitejs.dev/config/).
+To run with a different .gltf or .glb model:
+1. Place the model file in the public/threeJS/models directory.
+2. Change the helmetFile property to reference the new model. For example, it's set to load "/threeJS/models/Helmet_Eagle.gltf";
+
+
+To run on mobile:
+1. Start the vite local server
+2. Port through ngrok using: http port <PORT>.
+3. View the app through the https:// link it gives you
 
 ## Project Setup
 
